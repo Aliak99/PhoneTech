@@ -1,16 +1,16 @@
 <template>
   <input
-    :value="content"
-    @input="content = ($event.target as HTMLInputElement).value"
+    :value="variable"
+    @input="variable = ($event.target as HTMLInputElement).value"
     type="text"
   />
-  <p>{{ content }}</p>
+  <p>{{ variable }}</p>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 
-const content = ref("");
+const variable = ref("");
 </script>
 
 <style scoped lang="scss"></style>
