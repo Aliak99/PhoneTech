@@ -1,15 +1,16 @@
 <template>
-  <button @click="toggle = !toggle">Toggle</button>
-  <div v-if="toggle">
-    <Blog />
-  </div>
+  <input
+    :value="content"
+    @input="content = ($event.target as HTMLInputElement).value"
+    type="text"
+  />
+  <p>{{ content }}</p>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import Blog from "./Blog.vue";
 
-const toggle = ref(true);
+const content = ref("");
 </script>
 
 <style scoped lang="scss"></style>
