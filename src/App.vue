@@ -1,17 +1,15 @@
 <template>
-  <input
-    :value="variable"
-    @input="variable = ($event.target as HTMLInputElement).value"
-    type="text"
-  />
-  <p>{{ variable }}</p>
+  <Blog v-model:agree="content" v-model:name.maj="name" />
+  <p>{{ content }}</p>
+  <p>{{ name }}</p>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import Blog from "./Blog.vue";
 
-const variable = ref("");
+const content = ref(null);
+const name = ref("");
 </script>
 
 <style scoped lang="scss"></style>

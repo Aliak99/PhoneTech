@@ -1,46 +1,48 @@
 <template>
-  <h1>Blog</h1>
-  <button @click="count++">+1</button>
-  <p>{{ count }}</p>
+  <h1>Question</h1>
+  <button :class="{ active: agree }" @click="updateValue($event, true)">
+    Oui !
+  </button>
+  <button
+    :class="{ active: agree == false }"
+    @click="updateValue($event, false)"
+  >
+    Non !
+  </button>
+  <hr />
+  <input :value="name" @input="updateNameValue" type="text" />
 </template>
-  
-  <script setup lang="ts">
-import {
-  onBeforeMount,
-  onBeforeUnmount,
-  onBeforeUpdate,
-  onMounted,
-  onUnmounted,
-  onUpdated,
-  ref,
-} from "vue";
 
-const count = ref(0);
+<script setup lang="ts">
+const props = defineProps<{
+  agree: boolean | null;
+  name: string;
+  nameModifiers?: { [s: string]: boolean };
+}>();
 
-const intervalId = setInterval(() => {
-  console.log("tick");
-}, 1000);
+const emit = defineEmits<{
+  (e: "update:agree", value: boolean);
+  (e: "update:name", value: boolean);
+}>();
 
-onBeforeMount(() => {
-  console.log("Avant le montage");
-});
-onMounted(() => {
-  console.log("Après le montage");
-});
-onBeforeUpdate(() => {
-  console.log("Avant la mise à jour");
-});
-onUpdated(() => {
-  console.log("Après la mise à jour");
-});
-onBeforeUnmount(() => {
-  console.log("Avant la destruction / démontage");
-});
-onUnmounted(() => {
-  clearInterval(intervalId);
-  console.log("Démontage");
-});
+function updateValue(event: MouseEvent, value: boolean) {
+  emit("update:agree", value);
+}
+
+function updateNameValue(event: Event) {
+  let value = (event.target as HTMLInputElement).value;
+  if (value) {
+    if (props.nameModifiers?.maj) {
+      emit("update:name", value[0].toUpperCase() + value.slice(1));
+    } else {
+      emit("update:name", value);
+    }
+  }
+}
 </script>
-  
-  <style scoped lang="scss"></style>
-  
+
+<style scoped lang="scss">
+.active {
+  background-color: red;
+}
+</style>
