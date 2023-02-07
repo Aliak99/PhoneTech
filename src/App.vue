@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import Blog from "./Blog.vue";
 
 const variable = ref("");
 </script>
