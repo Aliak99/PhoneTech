@@ -1,24 +1,16 @@
 <template>
   <small> {{ author.name }} - {{ author.birthdate }}</small>
-  <p>{{ api }}</p>
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import type { AuthorInterface } from "./App.vue";
+import { inject } from 'vue';
+import { authorKey } from "./ProvideKeys";
 
-const { author, updateBirthday } = inject<
-  Readonly<{
-    author: AuthorInterface;
-    updateBirthday: () => void;
-  }>
->("author")!;
+const { author, updateBirthday } = inject(authorKey)!;
 
 setTimeout(() => {
   updateBirthday();
-}, 2000);
-
-const api = inject("API_URL");
+}, 5000);
 </script>
 
 <style scoped lang="scss"></style>

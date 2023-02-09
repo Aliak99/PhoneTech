@@ -7,12 +7,8 @@
 
 <script setup lang="ts">
 import { provide, reactive, readonly } from "vue";
+import { authorKey } from "./ProvideKeys";
 import Blog from "./Blog.vue";
-
-export interface AuthorInterface {
-  name: string;
-  birthdate: number;
-}
 
 const author = reactive({
   name: "Chateaubriand",
@@ -23,7 +19,10 @@ function updateBirthday() {
   author.birthdate = 2000;
 }
 
-provide("author", readonly({ author, updateBirthday }));
+provide(authorKey, {
+  author: readonly(author),
+  updateBirthday,
+});
 </script>
 
 <style scoped lang="scss"></style>
