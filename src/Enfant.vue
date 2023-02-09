@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="title">
-      <slot name="header"></slot>
+      <slot name="header" :date="date"></slot>
     </div>
     <section>
       <slot name="default"></slot>
@@ -12,7 +12,9 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const date = new Date();
+</script>
 
 <style scoped lang="scss">
 .container {
