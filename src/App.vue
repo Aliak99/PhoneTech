@@ -1,28 +1,16 @@
 <template>
-  <input type="text" v-model="author.name" />
-  <div>
-    <Blog />
-  </div>
+
+  <Enfant v-model:prenom.maj="prenom" v-model:nom.maj="nom" />
+  <h1>Prenom: {{ prenom }}</h1>
+  <h1>Nom: {{ nom }}</h1>
 </template>
 
 <script setup lang="ts">
-import { provide, reactive, readonly } from "vue";
-import { authorKey } from "./ProvideKeys";
-import Blog from "./Blog.vue";
+import { ref } from "vue";
+import Enfant from "./Enfant.vue";
 
-const author = reactive({
-  name: "Chateaubriand",
-  birthdate: 1768,
-});
-
-function updateBirthday() {
-  author.birthdate = 2000;
-}
-
-provide(authorKey, {
-  author: readonly(author),
-  updateBirthday,
-});
+const prenom = ref("");
+const nom = ref("");
 </script>
 
 <style scoped lang="scss"></style>
