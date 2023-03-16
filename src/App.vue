@@ -1,16 +1,35 @@
 <template>
-
-  <Enfant v-model:prenom.maj="prenom" v-model:nom.maj="nom" />
-  <h1>Prenom: {{ prenom }}</h1>
-  <h1>Nom: {{ nom }}</h1>
+  <div>
+    <input name="email" v-model="email" />
+    <p>{{ emailError }}</p>
+    <input name="password" v-model="password" type="password" />
+    <p>{{ passwordError }}</p>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import Enfant from "./Enfant.vue";
+import { useForm, useField } from "vee-validate";
 
-const prenom = ref("");
-const nom = ref("");
+const validationSchema = {
+  email(value) {
+    if (value.includes("@") && value.length > 5) {
+      return true;
+    } else {
+      return "Email non valide";
+    }
+  },
+  password(value) {
+    if (value?.length >= 8) {
+      return true;
+    } else {
+      return "Le mot de passe doit être de 8 caractères au moins";
+    }
+  },
+};
+useForm({ validationSchema });
+
+const { value: email, errorMessage: emailError } = useField("email");
+const { value: password, errorMessage: passwordError } = useField("password");
 </script>
 
 <style scoped lang="scss"></style>
