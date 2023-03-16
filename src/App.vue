@@ -1,35 +1,28 @@
 <template>
-  <div>
-    <input name="email" v-model="email" />
-    <p>{{ emailError }}</p>
-    <input name="password" v-model="password" type="password" />
-    <p>{{ passwordError }}</p>
-  </div>
+  <input v-model="usernameValue" type="text" />
+  <p v-if="usernameError">{{ usernameError }}</p>
+
+  <pre>
+    {{ usernameValue }}
+  </pre>
 </template>
 
 <script setup lang="ts">
 import { useForm, useField } from "vee-validate";
+import { z } from "zod";
+import { toFormValidator } from "@vee-validate/zod";
 
-const validationSchema = {
-  email(value) {
-    if (value.includes("@") && value.length > 5) {
-      return true;
-    } else {
-      return "Email non valide";
-    }
-  },
-  password(value) {
-    if (value?.length >= 8) {
-      return true;
-    } else {
-      return "Le mot de passe doit être de 8 caractères au moins";
-    }
-  },
-};
-useForm({ validationSchema });
+const validationSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: "Le champ est trop court" })
+    .nonempty({ message: "Le champ est obligatoire" })
+    .max(10, { message: "Le champ est trop long" }),
+});
 
-const { value: email, errorMessage: emailError } = useField("email");
-const { value: password, errorMessage: passwordError } = useField("password");
+useForm({ validationSchema: toFormValidator(validationSchema) });
+
+const { value: usernameValue, errorMessage: usernameError } = useField("username");
 </script>
 
 <style scoped lang="scss"></style>
