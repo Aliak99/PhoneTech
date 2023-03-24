@@ -1,11 +1,25 @@
 <template>
-  <form @submit="mySubmit">
+  <form @submit="submit">
     <div>
-      <input v-model="emailValue" type="email" placeholder="Prénom" />
+      <select v-model="cityValue">
+        <option value disabled>--Choisissez une ville--</option>
+        <option value="Nice">Nice</option>
+        <option value="Paris">Paris</option>
+        <option value="Lyon">Lyon</option>
+      </select>
     </div>
     <pre>{{ errorMessage }}</pre>
-    <button :disabled="isSubmitting">Envoi</button>
-    <pre>{{ submitCount }}</pre>
+    <div>
+      <input v-model="zipValue" type="number" />
+    </div>
+    <div>
+      <input v-model="minValue" type="number" />
+    </div>
+    <div>
+      <input v-model="maxValue" type="number" />
+    </div>
+    <pre>{{ values }}</pre>
+    <button>Envoi</button>
   </form>
 </template>
 
@@ -14,29 +28,21 @@ import { useField, useForm } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 
-const { handleSubmit, isSubmitting, submitCount } = useForm();
+const { handleSubmit, values } = useForm();
 
-const promise = new Promise((resolve) => setTimeout(() => resolve(true), 3000));
+const submit = handleSubmit(() => {});
 
-const mySubmit = handleSubmit(
-  async (values, { resetForm }) => {
-    await promise;
-    resetForm({
-      values: { email: "exemple@gmail.com" },
-      errors: { email: "Pas valide !" },
-      touched: { email: false },
-      submitCount: submitCount.value,
-    });
-  },
-  (errors) => {
-    console.log(errors);
-  }
+const { value: cityValue, errorMessage } = useField(
+  "address.city",
+  toFieldValidator(z.string({ required_error: "Veuillez choisir une ville" }), {
+    validateOnValueUpdate: false,
+    initialValue: "",
+  })
 );
+const { value: zipValue } = useField("address.zip.code");
 
-const { value: emailValue, errorMessage } = useField(
-  "email",
-  toFieldValidator(z.string().min(5, { message: "Trop court !" }))
-);
+const { value: minValue } = useField("minMax[0]");
+const { value: maxValue } = useField("minMax[1]");
 </script>
 
 <style scoped lang="scss"></style>
