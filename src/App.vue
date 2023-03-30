@@ -1,116 +1,94 @@
 <template>
-  <form>
-    <div>
-      <fieldset class="InputGroup" v-for="(field, idx) in fields" :key="field.key">
-        <legend>Utilisateur #{{ idx }}</legend>
-        <label :for="`name_${idx}`">Prénom</label>
-        <Field
-          :id="`name_${idx}`"
-          :name="`users[${idx}].name`"
-          v-slot="{ field, errorMessage }"
-        >
-          <input v-bind="field" type="text" />
-          <p>{{ errorMessage }}</p>
-        </Field>
-        <p>{{ errorMessage }}</p>
-
-        <label :for="`email_${idx}`">Email</label>
-        <Field
-          :id="`email_${idx}`"
-          :name="`users[${idx}].email`"
-          type="email"
-          v-slot="{ field, errorMessage }"
-        >
-          <input v-bind="field" type="text" />
-          <p>{{ errorMessage }}</p>
-        </Field>
-        <button type="button" @click="remove(idx)">X</button>
-      </fieldset>
+  <div class="container">
+    <div class="p-20">
+      <h3 class="mb-10">Formulaire</h3>
+      <form @submit="mySubmit">
+        <input v-model="nameValue" class="mr-10" type="text" placeholder="Prénom" />
+        <input v-model="emailValue" class="mr-10" type="text" placeholder="Email" />
+        <button class="btn btn-primary">Sauvegarder</button>
+      </form>
     </div>
-
-    <button type="button" @click="push({ email: '', name: '' })">
-      Ajouter un utilisateur +
-    </button>
-    <br />
-    <br />
-
-    <pre>{{ values }}</pre>
-    <pre>{{ errors }}</pre>
-  </form>
+    <div class="p-20">
+      <h3 class="mb-10">Liste des utilisateurs :</h3>
+      <ul>
+        <li v-for="user in state.users" :key="user._id">
+          <p class="mr-10">Name: {{ user.name }}</p>
+          <p class="mr-10">Email: {{ user.email }}</p>
+          <p class="mr-10">------------------------</p>
+          <button @click="deleteUser(user._id)" type="button" class="btn btn-danger">
+            Supprimer
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useForm, useFieldArray, Field } from "vee-validate";
-import { z } from "zod";
-import { toFormValidator } from "@vee-validate/zod";
+import { useForm, useField } from "vee-validate";
+import { reactive } from "vue";
 
-const validationSchema = toFormValidator(
-  z.object({
-    users: z.array(
-      z.object({
-        name: z.string().min(1, { message: "Champ obligatoire" }),
-        email: z.string().email({ message: "Email invalide" }),
-      })
-    ),
-  })
-);
+interface User {
+  name: string;
+  email: string;
+  createdAt?: string;
+  _id?: string;
+}
 
-const { values, errors } = useForm({
-  validationSchema,
-  initialValues: {
-    users: [{ name: "", email: "" }],
-  },
+const state = reactive<{ users: User[] }>({
+  users: [],
 });
-const { fields, push, remove } = useFieldArray("users");
+
+const { handleSubmit, resetForm } = useForm();
+
+const mySubmit = handleSubmit(async (value) => {
+  try {
+    const response = await fetch("https://restapi.fr/api/vueusers", {
+      method: "POST",
+      body: JSON.stringify(value),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const user: User = await response.json();
+    state.users.push(user);
+    resetForm();
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+const { value: emailValue } = useField("email");
+const { value: nameValue } = useField("name");
+
+async function fetchUsers() {
+  try {
+    const response = await fetch("https://restapi.fr/api/vueusers");
+    const users: User | User[] = await response.json();
+    if (users) {
+      state.users = Array.isArray(users) ? users : [users];
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function deleteUser(userId?: string) {
+  try {
+    if (userId) {
+      await fetch(`https://restapi.fr/api/vueusers?id=${userId}`, {
+        method: "DELETE",
+      });
+      state.users = state.users.filter((user) => user._id !== userId);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+fetchUsers();
 </script>
 
-<style>
-#app {
-  font-family: Arial, Helvetica, sans-serif;
-  max-width: 500px;
-}
-
-input {
-  display: block;
-}
-
-span {
-  display: block;
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-top: 20px;
-}
-
-button {
-  display: block;
-}
-
-button[type="submit"] {
-  margin-top: 10px;
-}
-
-form {
-  padding: 20px;
-  border: 1px solid black;
-}
-
-form + form {
-  margin-top: 20px;
-}
-
-.InputGroup {
-  padding: 10px;
-  border: 2px dotted black;
-  margin-bottom: 30px;
-  position: relative;
-}
-
-.InputGroup button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
+<style lang="scss">
+@import "./assets/base.scss";
 </style>
