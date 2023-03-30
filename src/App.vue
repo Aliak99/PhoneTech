@@ -3,7 +3,13 @@
     <div class="p-20">
       <h3 class="mb-10">Formulaire</h3>
       <form @submit="mySubmit">
-        <input v-model="nameValue" class="mr-10" type="text" placeholder="Prénom" />
+        <input
+          ref="name"
+          v-model="nameValue"
+          class="mr-10"
+          type="text"
+          placeholder="Prénom"
+        />
         <input v-model="emailValue" class="mr-10" type="text" placeholder="Email" />
         <button class="btn btn-primary">Sauvegarder</button>
       </form>
@@ -11,11 +17,15 @@
     <div class="p-20">
       <h3 class="mb-10">Liste des utilisateurs :</h3>
       <ul>
-        <li v-for="user in state.users" :key="user._id">
-          <p class="mr-10">Name: {{ user.name }}</p>
-          <p class="mr-10">Email: {{ user.email }}</p>
+        <li
+          @click="state.selectedUser = user"
+          v-for="user in state.users"
+          :key="user._id"
+        >
+          <p class="mr-10 flex-fill">Name: {{ user.name }}</p>
+          <p class="mr-10 flex-fill">Email: {{ user.email }}</p>
           <p class="mr-10">------------------------</p>
-          <button @click="deleteUser(user._id)" type="button" class="btn btn-danger">
+          <button @click.stop="deleteUser(user._id)" type="button" class="btn btn-danger">
             Supprimer
           </button>
         </li>
@@ -26,7 +36,7 @@
 
 <script setup lang="ts">
 import { useForm, useField } from "vee-validate";
-import { reactive } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 
 interface User {
   name: string;
@@ -35,24 +45,48 @@ interface User {
   _id?: string;
 }
 
-const state = reactive<{ users: User[] }>({
+const state = reactive<{
+  users: User[];
+  selectedUser: User | null;
+}>({
   users: [],
+  selectedUser: null,
 });
+const name = ref<HTMLInputElement | null>(null);
+
+onMounted(() => name.value?.focus());
 
 const { handleSubmit, resetForm } = useForm();
 
 const mySubmit = handleSubmit(async (value) => {
   try {
-    const response = await fetch("https://restapi.fr/api/vueusers", {
-      method: "POST",
-      body: JSON.stringify(value),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const user: User = await response.json();
-    state.users.push(user);
+    if (state.selectedUser) {
+      const response = await fetch(
+        `https://restapi.fr/api/vueusers?id=${state.selectedUser._id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(value),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const user: User = await response.json();
+      state.users = state.users.map((u) => (u._id === user._id ? user : u));
+      state.selectedUser = null;
+    } else {
+      const response = await fetch("https://restapi.fr/api/vueusers", {
+        method: "POST",
+        body: JSON.stringify(value),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const user: User = await response.json();
+      state.users.push(user);
+    }
     resetForm();
+    name.value?.focus();
   } catch (err) {
     console.error(err);
   }
@@ -73,6 +107,8 @@ async function fetchUsers() {
   }
 }
 
+fetchUsers();
+
 async function deleteUser(userId?: string) {
   try {
     if (userId) {
@@ -86,7 +122,18 @@ async function deleteUser(userId?: string) {
   }
 }
 
-fetchUsers();
+watch(
+  () => state.selectedUser,
+  (user: User | null) => {
+    if (user) {
+      nameValue.value = user.name;
+      emailValue.value = user.email;
+    } else {
+      nameValue.value = "";
+      emailValue.value = "";
+    }
+  }
+);
 </script>
 
 <style lang="scss">
