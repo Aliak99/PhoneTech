@@ -6,7 +6,9 @@
     <button @click="selectedComponant = 'PageB'" class="btn btn-primary mr-10">
       Page B
     </button>
-    <Component :is="composants[selectedComponant]" />
+    <KeepAlive :max="5">
+      <Component :is="composants[selectedComponant]" />
+    </KeepAlive>
   </div>
 </template>
 
