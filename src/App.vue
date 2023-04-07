@@ -1,71 +1,76 @@
 <template>
   <div class="p-20">
     <div class="mb-20 d-flex w100 justify-content-center align-items-center">
-      <Transition name="fadeCircle" mode="out-in">
-        <button
-          v-if="selectedComponent === 'B'"
-          class="btn btn-primary mr-20"
-          @click="selectedComponent = 'A'"
-        >
-          Composant A
-        </button>
-        <button v-else class="btn btn-primary" @click="selectedComponent = 'B'">
-          Composant B
-        </button>
-      </Transition>
+      <input
+        v-model="input"
+        @keydown.enter="addItem"
+        type="text"
+        class="flex-fill mr-20"
+      />
+      <button class="btn btn-primary mr-20" @click="addItem">Ajouter</button>
     </div>
-    <Transition name="fadeRight" mode="out-in">
-      <Component :is="components[selectedComponent]" />
-    </Transition>
+    <div class="container">
+      <TransitionGroup tag="ul">
+        <li
+          :style="`--i:${index}`"
+          class="w-100 card mb-10"
+          v-for="(item, index) in items"
+          @click="removeItem(index)"
+          :key="item"
+        >
+          {{ item }}
+        </li>
+      </TransitionGroup>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { Component as Co } from "vue";
-import A from "./A.vue";
-import B from "./B.vue";
-import C from "./C.vue";
 
-const components: { [s: string]: Co } = {
-  A,
-  B,
-  C,
-};
+const input = ref("");
+const items = ref<string[]>(["Pomme", "Fraise", "Poire"]);
 
-const selectedComponent = ref("A");
+function addItem() {
+  items.value.push(input.value);
+  input.value = "";
+}
+
+function removeItem(index: number) {
+  items.value.splice(index, 1);
+}
 </script>
 
 <style lang="scss">
 @import "./assets/scss/base.scss";
 
-.fadeRight-leave-to {
-  transform: translateX(10px);
-  opacity: 0;
+li {
+  cursor: pointer;
 }
 
-.fadeRight-enter-active,
-.fadeRight-leave-active {
-  transition: all 0.4s;
+.container {
+  position: relative;
 }
 
-.fadeRight-enter-from {
+.v-enter-from {
   transform: translateX(-10px);
   opacity: 0;
 }
 
-.fadeCircle-leave-to {
-  transform: translateX(30px) rotateY(180deg);
-  opacity: 0;
+.v-leave-active {
+  width: 100%;
+  transition: all 1s;
+  position: absolute;
 }
 
-.fadeCircle-enter-active,
-.fadeCircle-leave-active {
-  transition: all 0.4s;
+.v-move,
+.v-enter-active {
+  transition: all 1s;
+  transition-delay: calc(var(--i) * 0.2s);
 }
 
-.fadeCircle-enter-from {
-  transform: translateX(-30px) rotateY(-180deg);
+.v-leave-to {
+  transform: translateX(10px);
   opacity: 0;
 }
 </style>
