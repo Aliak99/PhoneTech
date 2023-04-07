@@ -9,10 +9,10 @@
         similia iussisse factitarunt propositum similia neminem revocari adulatorum
         accendente fertur ob adulatorum principes accendente inexorabiles elogio vitium
         exitiale aliis progressu eius eius eius et non quoque vel in in quod more de
-        propositum quod oblato factitarunt poenae hoc principes exitiale cohorte hoc
-        similia hoc aliis quod de in in addictum eius adulatorum quoque et ob oblato
-        neminem numquam adulatorum addictum ob quod cohorte aliis neminem vel revocari hoc
-        hoc similia.
+        propositum quod oblato factitarunt poenae hoc principes exitiale cohorte hoc hoc
+        hoc similia hoc aliis quod de in in addictum eius adulatorum ob ob oblato neminem
+        numquam adulatorum addictum ob quod cohorte aliis neminem vel revocari hoc hoc
+        similia.
       </p>
     </Transition>
   </div>
