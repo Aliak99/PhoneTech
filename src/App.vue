@@ -1,47 +1,71 @@
 <template>
   <div class="p-20">
-    <button class="btn btn-primary" @click="show = !show">Cliquez !</button>
-    <Transition name="mon-animation" appear>
-      <p v-if="show">
-        Principes fertur et exitiale aliquando oblato factitarunt quod propositum quod
-        illo ob illo numquam obstinatum obstinatum quoque aetatis revocari iussisse vitium
-        factitarunt inexorabiles aetatis quod accendente fertur aetatis iussisse vitium
-        similia iussisse factitarunt propositum similia neminem revocari adulatorum
-        accendente fertur ob adulatorum principes accendente inexorabiles elogio vitium
-        exitiale aliis progressu eius eius eius et non quoque vel in in quod more de
-        propositum quod oblato factitarunt poenae hoc principes exitiale cohorte hoc hoc
-        hoc similia hoc aliis quod de in in addictum eius adulatorum ob ob oblato neminem
-        numquam adulatorum addictum ob quod cohorte aliis neminem vel revocari hoc hoc
-        similia.
-      </p>
+    <div class="mb-20 d-flex w100 justify-content-center align-items-center">
+      <Transition name="fadeCircle" mode="out-in">
+        <button
+          v-if="selectedComponent === 'B'"
+          class="btn btn-primary mr-20"
+          @click="selectedComponent = 'A'"
+        >
+          Composant A
+        </button>
+        <button v-else class="btn btn-primary" @click="selectedComponent = 'B'">
+          Composant B
+        </button>
+      </Transition>
+    </div>
+    <Transition name="fadeRight" mode="out-in">
+      <Component :is="components[selectedComponent]" />
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
+import type { Component as Co } from "vue";
+import A from "./A.vue";
+import B from "./B.vue";
+import C from "./C.vue";
 
-const show = ref(true);
+const components: { [s: string]: Co } = {
+  A,
+  B,
+  C,
+};
+
+const selectedComponent = ref("A");
 </script>
 
 <style lang="scss">
 @import "./assets/scss/base.scss";
 
-@keyframes mon-animation {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
+.fadeRight-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
 }
-.mon-animation-enter-active {
-  animation: mon-animation 0.5s;
+
+.fadeRight-enter-active,
+.fadeRight-leave-active {
+  transition: all 0.4s;
 }
-.mon-animation-leave-active {
-  animation: mon-animation 0.5s reverse;
+
+.fadeRight-enter-from {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+
+.fadeCircle-leave-to {
+  transform: translateX(30px) rotateY(180deg);
+  opacity: 0;
+}
+
+.fadeCircle-enter-active,
+.fadeCircle-leave-active {
+  transition: all 0.4s;
+}
+
+.fadeCircle-enter-from {
+  transform: translateX(-30px) rotateY(-180deg);
+  opacity: 0;
 }
 </style>
